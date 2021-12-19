@@ -1,0 +1,3 @@
+Pour lancer le server avec Docker il suffit d'entrer les commandes suvantes: sudo docker-compose build
+									     sudo docker-compose build
+Pour supprimer les containers cree par docker: sudo docker system prune -a ou pour supprimer seulment un container specifique: sudo docker containers ls. Il suffit de recuperer le container name et d'entrer: sudo docker containers rm [containers name{ID}]

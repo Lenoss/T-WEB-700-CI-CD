@@ -1,0 +1,83 @@
+- pipeline: "Test and build the project in Vuejs and Nestjs"
+  on: "EVENT"
+  events:
+  - type: "PUSH"
+    refs:
+    - "refs/heads/master"
+  priority: "NORMAL"
+  auto_clear_cache: true
+  fail_on_prepare_env_warning: true
+  actions:
+  - action: "Execute: npm test"
+    type: "BUILD"
+    disabled: true
+    working_directory: "/buddy/t-web-700-ci-cd"
+    docker_image_name: "library/node"
+    docker_image_tag: "12"
+    execute_commands:
+    - "# yarn install"
+    - "cd front/tweb-front"
+    - "npm install"
+    - "npm test"
+    volume_mappings:
+    - "/:/buddy/t-web-700-ci-cd"
+    cache_base_image: true
+    shell: "BASH"
+  - action: "Execute: npm test"
+    type: "BUILD"
+    disabled: true
+    working_directory: "/buddy/t-web-700-ci-cd"
+    docker_image_name: "library/node"
+    docker_image_tag: "12"
+    execute_commands:
+    - "# yarn install"
+    - "cd api/"
+    - "npm install"
+    - "npm test"
+    volume_mappings:
+    - "/:/buddy/t-web-700-ci-cd"
+    cache_base_image: true
+    shell: "BASH"
+  - action: "Upload files to 3.129.92.111"
+    type: "SFTP"
+    disabled: true
+    input_type: "BUILD_ARTIFACTS"
+    remote_path: "/home/ubuntu/Crypto/T-WEB-700-CI-CD"
+    login: "ubuntu"
+    password: "secure!IN81U0tpDX9m9T8T5N6/tw==.GLA6tdeZcxWNIPbVgSHdQw=="
+    host: "3.129.92.111"
+    port: "22"
+    authentication_mode: "PASS"
+  - action: "[3.129.92.111] Execute: sudo docker-compose up"
+    type: "SSH_COMMAND"
+    working_directory: "/home/ubuntu/Crypto/T-WEB-700-CI-CD"
+    login: "ubuntu"
+    password: "secure!IN81U0tpDX9m9T8T5N6/tw==.GLA6tdeZcxWNIPbVgSHdQw=="
+    host: "3.129.92.111"
+    port: "22"
+    authentication_mode: "PASS"
+    commands:
+    - "sudo docker system prune -a"
+    - "y"
+    run_as_script: true
+    shell: "BASH"
+  - action: "[3.129.92.111] Execute: sudo docker-compose up"
+    type: "SSH_COMMAND"
+    working_directory: "/home/ubuntu/Crypto/T-WEB-700-CI-CD"
+    login: "ubuntu"
+    password: "secure!IN81U0tpDX9m9T8T5N6/tw==.GLA6tdeZcxWNIPbVgSHdQw=="
+    host: "3.129.92.111"
+    port: "22"
+    authentication_mode: "PASS"
+    commands:
+    - "sudo docker-compose build"
+    - "sudo docker-compose up"
+    run_as_script: true
+    shell: "BASH"
+  - action: "Send Email notification"
+    type: "EMAIL"
+    disabled: true
+    title: "$BUDDY_PIPELINE_NAME execution #$BUDDY_EXECUTION_ID"
+    from_name: "T-WEB CI/CD"
+    content: "Le Pipelines a était exécuté suite au commit: #$BUDDY_EXECUTION_PREVIOUS_REVISION_MESSAGE\r\nTemps d'exécution: #$BUDDY_EXECUTION_TIME\r\nL'étape #$BUDDY_FAILED_ACTION_NAME a échoué avec les logs suivant: #$BUDDY_FAILED_ACTION_LOGS\r\n\r\nResultat du test et du build CI-CD T-WEB."
+    recipients: "leandro.encarnacao@epitech.eu\r\nmawuse-komi-aime.alognikou@epitech.eu\r\nnicolas.catoire@epitech.eu\r\nteddy.clement@epitech.eu\r\nAlexandre.haramboure@epiitech.eu"
